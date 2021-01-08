@@ -17,7 +17,7 @@ namespace SalesWebMvc.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["Message"] = "This project has the goal to help a Sales deparment to manage his employers and track their sales.";
 
             return View();
         }

@@ -18,8 +18,19 @@ namespace SalesWebMvc.Services
         }
         public void Insert(Seller obj)
         {
-            obj.Department = _context.Department.First();//Add the first deparment so it doesnt show the error from FK
+           // obj.Department = _context.Department.First();//Add the first deparment so it doesnt show the error from FK
             _context.Add(obj);
+            _context.SaveChanges();
+        }
+        public Seller FindById(int id)
+        {
+            return _context.Seller.FirstOrDefault(obj => obj.Id == id);
+        }
+
+        public void Remove(int id)
+        {
+            var obj = _context.Seller.Find(id);
+            _context.Seller.Remove(obj);
             _context.SaveChanges();
         }
     }

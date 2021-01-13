@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SalesWebMvc.Models;
 using SalesWebMvc.Services;
+using SalesWebMvc.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,11 @@ namespace SalesWebMvc.Controllers
     public class SellersController : Controller
     {
         private readonly SellerService _sellerServices;
-        public SellersController(SellerService sellerService)
+        private readonly DepartmentService _departmentService;
+        public SellersController(SellerService sellerService, DepartmentService departmentService)
         {
             _sellerServices = sellerService;
+            _departmentService = departmentService;
         }
         public IActionResult Index()
         {
@@ -22,7 +25,9 @@ namespace SalesWebMvc.Controllers
         }
         public IActionResult Create()
         {
-            return View();
+            var departments = _departmentService.FindAll(); //Get all the Departments 
+            var viewModel = new SellerFormViewModel { Departments = departments };
+            return View(viewModel);
         }
         [HttpPost] //Notation to define that the action is a Post request.
         [AutoValidateAntiforgeryToken] //Prevent attack in your session from others
@@ -30,6 +35,25 @@ namespace SalesWebMvc.Controllers
         {
             _sellerServices.Insert(seller);
            return RedirectToAction(nameof (Index));
+        }
+        public IActionResult Delete(int? id)
+        {
+            if (id == null) {
+                return NotFound();
+            }
+            var obj = _sellerServices.FindById(id.Value);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            return View(obj);
+        }
+        [HttpPost] //Notation to define that the action is a Post request.
+        [AutoValidateAntiforgeryToken] //Prevent attack in your session from others
+        public IActionResult Delete(int id)
+        {
+            _sellerServices.Remove(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

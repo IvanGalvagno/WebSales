@@ -12,6 +12,9 @@ namespace SalesWebMvc.Models
         public DateTime BirthDate { get; set; }
         public double BaseSalary { get; set; }
 
+        //FK in the DB
+        public int DepartmentId { get; set; }
+
         //Association
         public Department Department { get; set; }
         public ICollection<SalesRecord> Sales { get; set; } = new List<SalesRecord>();

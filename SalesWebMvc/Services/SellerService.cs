@@ -18,6 +18,7 @@ namespace SalesWebMvc.Services
         }
         public void Insert(Seller obj)
         {
+            obj.Department = _context.Department.First();//Add the first deparment so it doesnt show the error from FK
             _context.Add(obj);
             _context.SaveChanges();
         }

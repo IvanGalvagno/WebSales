@@ -41,7 +41,7 @@ namespace SalesWebMvc.Controllers
                 var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
                 return View(viewModel);
             }
-           await _sellerServices.InserAsync(seller);
+            await _sellerServices.InserAsync(seller);
             return RedirectToAction(nameof(Index));
         }
         public async Task<IActionResult> Delete(int? id)
@@ -50,7 +50,7 @@ namespace SalesWebMvc.Controllers
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided" });
             }
-            var obj = await  _sellerServices.FindByIdAsync(id.Value);
+            var obj = await _sellerServices.FindByIdAsync(id.Value);
             if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
@@ -61,8 +61,15 @@ namespace SalesWebMvc.Controllers
         [AutoValidateAntiforgeryToken] //Prevent attack in your session from others
         public async Task<IActionResult> Delete(int id)
         {
-            await _sellerServices.RemoveAsync(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                await _sellerServices.RemoveAsync(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (IntegrityException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }
         }
         public async Task<IActionResult> Details(int? id)
         {
@@ -108,7 +115,7 @@ namespace SalesWebMvc.Controllers
             }
             try
             {
-               await _sellerServices.UpdateAsync(seller);
+                await _sellerServices.UpdateAsync(seller);
                 return RedirectToAction(nameof(Index));
             }
             catch (ApplicationException e)

@@ -23,7 +23,7 @@ namespace SalesWebMvc.Services
         {
             // obj.Department = _context.Department.First();//Add the first deparment so it doesnt show the error from FK
             _context.Add(obj);
-           await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
         public async Task<Seller> FindByIdAsync(int id)
         { //Include is the eager loading that is load object associetes to the main obj (using microsoft)
@@ -32,14 +32,21 @@ namespace SalesWebMvc.Services
 
         public async Task RemoveAsync(int id)
         {
-            var obj = await _context.Seller.FindAsync(id);
-            _context.Seller.Remove(obj);
-           await _context.SaveChangesAsync();
+            try
+            {
+                var obj = await _context.Seller.FindAsync(id);
+                _context.Seller.Remove(obj);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                throw new IntegrityException("Cant delete seller because has a sales");
+            }
         }
 
         public async Task UpdateAsync(Seller obj)
         {
-            if (! await _context.Seller.AnyAsync(x => x.Id == obj.Id))
+            if (!await _context.Seller.AnyAsync(x => x.Id == obj.Id))
             {
                 throw new NotFoundException("Id not found");
             }
@@ -47,7 +54,8 @@ namespace SalesWebMvc.Services
             {
                 _context.Update(obj);
                 await _context.SaveChangesAsync();
-            }catch(DbUpdateConcurrencyException e)
+            }
+            catch (DbUpdateConcurrencyException e)
             {
                 throw new DbConcurrencyException(e.Message);
             }
